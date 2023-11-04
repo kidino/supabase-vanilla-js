@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Listing Ajax</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  </head>
+  <body>
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col">
+
+                <button 
+                    class="btn btn-primary btn-sm pull-right"
+                    id="signout-button"
+                    >Sign Out</button>
+
+                <h1>Senarai Ahli Kariah</h1>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ORGANISASI</th>
+                            <th>NAMA</th>
+                            <th>ALAMAT</th>
+                            <th>EMAIL</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="listing-body">
+
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+<script type="module">
+    import { gebi } from './utils.js'
+    import { supabase, user, signOut, checkUser } from './supabase-utils.js'
+
+    // checks for valid session
+    checkUser();
+
+/*
+    In this example, the code tries to list all of the
+    records for the clients table. You may make any
+    necessary changes to make this work for you. Do not
+    forget to update your RLS (row-level-security) to
+    allow only authenticated user to view them. By default
+    the RLS will reject all request.     
+*/ 
+
+    let db_result = await supabase
+    .from('clients')
+    .select('*')
+
+    let data = db_result.data
+    console.log( data )
+
+    // loop through the data and add them to the table
+    data.forEach(function(item){
+        let row = `
+            <tr id="row-${item.id}">
+                <td>${item.id}</td>
+                <td>${item.name}</td>
+                <td>${item.contact_person}</td>
+                <td>${item.address}</td>
+                <td>${item.email}</td>
+                <td><button class="btn btn-sm btn-secondary" id="edit-${item.id}">EDIT</td>
+            </tr>
+        `;
+
+        gebi('listing-body').innerHTML += row;
+    });
+
+    // for signout button
+    gebi('signout-button').addEventListener('click', function(){
+        signOut()
+    })
+
+</script>
+
+  </body>
+</html>
